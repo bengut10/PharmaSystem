@@ -1,88 +1,139 @@
-CREATE TABLE diagnostic
+
+CREATE TABLE physician
 (
-   code number(5,2),
-   description varchar(255),
-   
-   CONSTRAINT checkPriCode PRIMARY KEY(code)
+  drlicense CHAR(255) NOT NULL,
+  name CHAR(255) NOT NULL,
+  phone NUMERIC(12,0) NOT NULL,
+  PRIMARY KEY (drlicense)
 )
 /
 
 CREATE TABLE drug
 (
-   id number(10) NOT NULL,
-   compound varchar(255),
-   targetCode number(10) NOT NULL,
-   price float NOT NULL,
-   
-   CONSTRAINT checkPriComp PRIMARY KEY(compound),
-   CONSTRAINT checkDiagCode FOREIGN KEY(targetCode) REFERENCES diagnostic(code) 
+  compound CHAR(255) NOT NULL,
+  price INT NOT NULL,
+  PRIMARY KEY (compound)
+)
+/
+
+CREATE TABLE diagnostic
+(
+  code NUMERIC(5,2) NOT NULL,
+  description CHAR(255) NOT NULL,
+  PRIMARY KEY (code)
 )
 /
 
 CREATE TABLE insurance
 (
-   planId varchar(255),
-   name varchar(255),
-   copay float,
-   support number(10),
-   
-   CONSTRAINT checkPlanID PRIMARY KEY(planId),
-   CONSTRAINT checkSupport FOREIGN KEY(support) 
-   REFERENCES drug(id)
+  policy CHAR(255) NOT NULL,
+  name CHAR(255) NOT NULL,
+  copay FLOAT NOT NULL,
+  PRIMARY KEY (policy)
 )
 /
 
-CREATE TABLE physician
+CREATE TABLE supports
 (
-   name varchar(255) NOT NULL,
-   license varchar(255) NOT NULL,
-   phone number(255) NOT NULL,
-
-   CONSTRAINT checkLicense PRIMARY KEY(license)
+  policy CHAR(255) NOT NULL,
+  compound CHAR(255) NOT NULL,
+  FOREIGN KEY (policy) REFERENCES insurance(policy),
+  FOREIGN KEY (compound) REFERENCES drug(compound)
 )
 /
 
-CREATE TABLE prescription
+CREATE TABLE inventory
 (
-   expdate date NOT NULL,
-   compound varchar(255) NOT NULL,
-   admin varchar(255) NOT NULL, /*This needs to be fixed*/
-   refils number NOT NULL,
-   quantity number NOT NULL,
-   diagnostic number(5,2)  NOT NULL,
-   rx number,
-   
-   CONSTRAINT checkRX PRIMARY KEY(rx),
-   CONSTRAINT checkCompound FOREIGN KEY(compound) 
-   REFERENCES drug(compound),
-   CONSTRAINT checkDiagnostic FOREIGN KEY(diagnostic) 
-   REFERENCES diagnostic(code)
- 
+  location INT NOT NULL,
+  quantity INT NOT NULL,
+  compound CHAR(255) NOT NULL,
+  FOREIGN KEY (compound) REFERENCES drug(compound)
 )
 /
 
-CREATE TABLE customer
+CREATE TABLE medPrescription
 (
-   name varchar(255) NOT NULL,
-   address varchar(255) NOT NULL,
-   ssn number,
-   phone number NOT NULL,
-   prescription number NOT NULL,
-   
-   CONSTRAINT checkPrescription FOREIGN KEY(prescription)
-   REFERENCES prescription(rx)
+  expiration DATE NOT NULL,
+  rx INT NOT NULL,
+  quantity INT NOT NULL,
+  admin CHAR(255) NOT NULL,
+  indication CHAR(255),
+  refill INT NOT NULL,
+  code NUMERIC(5,2) NOT NULL,
+  compound CHAR(255) NOT NULL,
+  PRIMARY KEY (rx),
+  FOREIGN KEY (code) REFERENCES diagnostic(code),
+  FOREIGN KEY (compound) REFERENCES drug(compound),
+  UNIQUE ()
+)
+/
 
+CREATE TABLE payment
+(
+  authorizarion INT NOT NULL,
+  cost FLOAT NOT NULL,
+  policy CHAR(255) NOT NULL,
+  compound CHAR(255) NOT NULL,
+  PRIMARY KEY (authorizarion),
+  FOREIGN KEY (policy) REFERENCES insurance(policy),
+  FOREIGN KEY (compound) REFERENCES drug(compound)
 )
 /
 
 CREATE TABLE transaction
 (
-   timeStamp date,
-   trnumber number, /*  this should be fixed */
-   totalCost float, /*this should be derived */
-   compound number NOT NULL,
-   quantity number NOT NULL,
+  timestamp DATE NOT NULL,
+  authorizarion INT NOT NULL,
+  FOREIGN KEY (authorizarion) REFERENCES payment(authorizarion)
 )
 /
-;
+
+CREATE TABLE customer
+(
+  name CHAR(255) NOT NULL,
+  dob DATE NOT NULL,
+  phone INT NOT NULL,
+  ssn INT NOT NULL,
+  address CHAR(255) NOT NULL,
+  policy CHAR(255) NOT NULL,
+  PRIMARY KEY (ssn),
+  FOREIGN KEY (policy) REFERENCES insurance(policy)
+)
+/
+
+CREATE TABLE treats
+(
+  compound CHAR(255) NOT NULL,
+  code NUMERIC(5,2) NOT NULL,
+  FOREIGN KEY (compound) REFERENCES drug(compound),
+  FOREIGN KEY (code) REFERENCES diagnostic(code)
+)
+/
+
+CREATE TABLE consults
+(
+  ssn INT NOT NULL,
+  drlicense CHAR(255) NOT NULL,
+  FOREIGN KEY (ssn) REFERENCES customer(ssn),
+  FOREIGN KEY (drlicense) REFERENCES physician(drlicense)
+)
+/
+
+CREATE TABLE cPrescription
+(
+  ssn INT NOT NULL,
+  rx INT NOT NULL,
+  FOREIGN KEY (ssn) REFERENCES customer(ssn),
+  FOREIGN KEY (rx) REFERENCES medPrescription(rx)
+)
+/
+
+CREATE TABLE allergy
+(
+  ssn INT NOT NULL,
+  compound CHAR(255) NOT NULL,
+  FOREIGN KEY (ssn) REFERENCES customer(ssn),
+  FOREIGN KEY (compound) REFERENCES drug(compound)
+);
+
   
