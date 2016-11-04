@@ -2,8 +2,8 @@
 
 CREATE TABLE physician
 (
-    drLicense CHAR(255),
-    dName CHAR(255) NOT NULL,
+    drLicense VARCHAR(255),
+    dName VARCHAR(255) NOT NULL,
     phone NUMERIC(10,0) NOT NULL UNIQUE,
     PRIMARY KEY (drLicense)
 );
@@ -18,7 +18,7 @@ INSERT INTO physician(drLicense, dName, phone) VALUES
 
 CREATE TABLE drug
 (
-    dName CHAR(255),
+    dName VARCHAR(255),
     price FLOAT NOT NULL,
     PRIMARY KEY(dName)
 );
@@ -33,7 +33,7 @@ INSERT INTO drug(dName, price) VALUES
 CREATE TABLE diagnostic
 (
   code NUMERIC(5,2),
-  description CHAR(255) NOT NULL,
+  description VARCHAR(255) NOT NULL,
   PRIMARY KEY (code)
 );
 
@@ -46,63 +46,109 @@ INSERT INTO diagnostic(code, description) VALUES
 
 CREATE TABLE insurance
 (
-  policy CHAR(255),
-  name CHAR(255) NOT NULL,
+  policy VARCHAR(255),
+  name VARCHAR(255) NOT NULL,
   copay FLOAT NOT NULL,
   PRIMARY KEY (policy)
 );
 
+INSERT INTO insurance(policy, name, copay) VALUES
+    ('dbron44686', 'BronzePlus', 400.00);
+INSERT INTO insurance(policy, name, copay) VALUES
+    ('abc7868999', 'SilverPlus', 200.00);
+INSERT INTO insurance(policy, name, copay) VALUES
+    ('jjohn33486', 'PlatinumPlatinum', 10.00);
+
+
+
 CREATE TABLE supports
 (
-  policy CHAR(255) NOT NULL,
-  compound CHAR(255) NOT NULL,
+  policy VARCHAR(255) NOT NULL,
+  compound VARCHAR(255) NOT NULL,
   FOREIGN KEY (policy) REFERENCES insurance(policy),
   FOREIGN KEY (compound) REFERENCES drug(dName)
 );
+
+INSERT INTO supports(policy, compound) VALUES
+    ('dbron44686', 'ibuprofen');
+INSERT INTO supports(policy, compound) VALUES
+    ('abc7868999', 'ibuprofen');
+INSERT INTO supports(policy, compound) VALUES
+    ('abc7868999', 'adderall');
+INSERT INTO supports(policy, compound) VALUES
+    ('jjohn33486', 'ibuprofen');
+INSERT INTO supports(policy, compound) VALUES
+    ('jjohn33486', 'adderall');
+INSERT INTO supports(policy, compound) VALUES
+    ('jjohn33486', 'codeine');
 
 
 CREATE TABLE inventory
 (
   location INT NOT NULL, --Reffers to a isle number in the store.--
   quantity INT NOT NULL,
-  compound CHAR(255) NOT NULL,
+  compound VARCHAR(255) NOT NULL,
   FOREIGN KEY (compound) REFERENCES drug(dName)
 );
 
+INSERT INTO inventory(location, quantity, compound) VALUES
+     (1, 17, 'adderall');  
+INSERT INTO inventory(location, quantity, compound) VALUES
+     (1, 17, 'ibuprofen');  
+INSERT INTO inventory(location, quantity, compound) VALUES
+     (2, 58, 'codeine');  
+
 CREATE TABLE payment
 (
-  authorizarion INT,
+  authorization INT,
   cost FLOAT NOT NULL,
-  policy CHAR(255) NOT NULL,
-  compound CHAR(255) NOT NULL,
-  PRIMARY KEY (authorizarion),
+  policy VARCHAR(255) NOT NULL,
+  compound VARCHAR(255) NOT NULL,
+  PRIMARY KEY (authorization),
   FOREIGN KEY (policy) REFERENCES insurance(policy),
   FOREIGN KEY (compound) REFERENCES drug(dName)
 );
 
+INSERT INTO payment(authorization, cost, policy, compound) VALUES
+    (1, 400.00, 'dbron44686', 'ibuprofen');
+INSERT INTO payment(authorization, cost, policy, compound) VALUES
+    (2, 200.00, 'abc7868999', 'adderall');
+INSERT INTO payment(authorization, cost, policy, compound) VALUES
+    (3, 10.00, 'jjohn33486', 'codeine');
+
 CREATE TABLE customer
 (
   id INT,
-  name CHAR(255) NOT NULL,
+  name VARCHAR(255) NOT NULL,
   dob DATE NOT NULL,
-  phone INT NOT NULL,
-  address CHAR(255) NOT NULL,
-  policy CHAR(255) NOT NULL,
+  phone VARCHAR(255) NOT NULL,
+  address VARCHAR(255) NOT NULL,
+  policy VARCHAR(255) NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (policy) REFERENCES insurance(policy)
 );
+
+INSERT INTO customer(id, name, dob, phone, address, policy) VALUES
+    (1, 'Bilbo Baggins', TO_DATE('1979/07/08', 'yyyy/mm/dd'), '860-326-4643', 
+		'12 Main', 'dbron44686');
+INSERT INTO customer(id, name, dob, phone, address, policy) VALUES
+    (2, 'Gandalf Grey', TO_DATE('1972/07/08', 'yyyy/mm/dd'), '478-346-4643', 
+		'1 Kempf', 'abc7868999');
+INSERT INTO customer(id, name, dob, phone, address, policy) VALUES
+    (3, 'George Bush', TO_DATE('1979/07/09', 'yyyy/mm/dd'), '840-333-3455', 
+		'12 twelve', 'jjohn33486');
 
 CREATE TABLE prescription
 (
   rx INT,
   expiration DATE NOT NULL,
   quantity INT NOT NULL,
-  admin CHAR(255) NOT NULL,
-  indication CHAR(255), --may be null
+  admin VARCHAR(255) NOT NULL,
+  indication VARCHAR(255), --may be null
   refill INT NOT NULL,
   code NUMERIC(5,2) NOT NULL,
-  compound CHAR(255) NOT NULL,
-  physician CHAR(255) NOT NULL,
+  compound VARCHAR(255) NOT NULL,
+  physician VARCHAR(255) NOT NULL,
   patient int NOT NULL,
   PRIMARY KEY (rx),
   FOREIGN KEY (physician) REFERENCES physician(drLicense),
@@ -111,18 +157,42 @@ CREATE TABLE prescription
   FOREIGN KEY (patient) REFERENCES customer(id)
 );
 
+
+INSERT INTO prescription(rx, expiration, quantity, admin, indication, refill, 
+			 code, compound, physician, patient) VALUES
+    (12, TO_DATE('2016-11-23', 'yyyy-mm-dd'), 40, 'pill', NULL, 2, 235.37, 
+		'adderall', 'a1234', 1); 
+INSERT INTO prescription(rx, expiration, quantity, admin, indication, refill, 
+			 code, compound, physician, patient) VALUES
+    (73, TO_DATE('2016-11-17', 'yyyy-mm-dd'), 50, 'pill', NULL, 2, 342.12, 
+		'ibuprofen', 'b3267', 2);
+INSERT INTO prescription(rx, expiration, quantity, admin, indication, refill, 
+			 code, compound, physician, patient) VALUES
+    (13, TO_DATE('2016-11-12', 'yyyy-mm-dd'), 50, 'fluid', NULL, 6, 434.23, 
+		'codeine', 'a1234', 3); 
+ 
+
+
 CREATE TABLE sale
 (
   timestamp DATE NOT NULL,
-  authorizarion INT NOT NULL,
+  authorization INT NOT NULL,
   rx INT NOT NULL,
   FOREIGN KEY (rx) REFERENCES prescription(rx),
-  FOREIGN KEY (authorizarion) REFERENCES payment(authorizarion)
+  FOREIGN KEY (authorization) REFERENCES payment(authorization)
 );
+
+INSERT INTO sale(timestamp, authorization, rx) VALUES
+    (TO_DATE('2016-07-07 14:20', 'yyyy-mm-dd hh24:mi'), 1, 12);
+INSERT INTO sale(timestamp, authorization, rx) VALUES
+    (TO_DATE('2016-07-08 13:22', 'yyyy-mm-dd hh24:mi'), 2, 73);
+INSERT INTO sale(timestamp, authorization, rx) VALUES
+    (TO_DATE('2016-06-09 12:20', 'yyyy-mm-dd hh24:mi'), 3, 13);
+
 
 CREATE TABLE treats
 (
-  compound CHAR(255) NOT NULL,
+  compound VARCHAR(255) NOT NULL,
   code NUMERIC(5,2) NOT NULL,
   FOREIGN KEY (compound) REFERENCES drug(dName),
   FOREIGN KEY (code) REFERENCES diagnostic(code)
@@ -139,8 +209,15 @@ INSERT INTO treats (compound, code) VALUES
 CREATE TABLE allergy
 (
   name INT NOT NULL,
-  compound CHAR(255) NOT NULL,
+  compound VARCHAR(255) NOT NULL,
   FOREIGN KEY (name) REFERENCES customer(id),
   FOREIGN KEY (compound) REFERENCES drug(dName)
 );
+
+INSERT INTO allergy(name, compound) VALUES
+    (1, 'codeine');
+INSERT INTO allergy(name, compound) VALUES
+    (2, 'adderall');
+INSERT INTO allergy(name, compound) VALUES
+    (3, 'ibuprofen');
 
