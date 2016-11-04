@@ -1,9 +1,16 @@
+--
+--Create a small pharmacy database
+--
 
+--set termout on
+--set feedback on
+prompt Building sample pharamacy database.  Please wait ...
+--set termout off
+--set feedback off
 
-CREATE TABLE physician
-(
-    drLicense VARCHAR(255),
-    dName VARCHAR(255) NOT NULL,
+CREATE TABLE physician(
+    drLicense VARCHAR(10),
+    dName VARCHAR(15) NOT NULL,
     phone NUMERIC(10,0) NOT NULL UNIQUE,
     PRIMARY KEY (drLicense)
 );
@@ -18,7 +25,7 @@ INSERT INTO physician(drLicense, dName, phone) VALUES
 
 CREATE TABLE drug
 (
-    dName VARCHAR(255),
+    dName VARCHAR(15),
     price FLOAT NOT NULL,
     PRIMARY KEY(dName)
 );
@@ -33,7 +40,7 @@ INSERT INTO drug(dName, price) VALUES
 CREATE TABLE diagnostic
 (
   code NUMERIC(5,2),
-  description VARCHAR(255) NOT NULL,
+  description VARCHAR(15) NOT NULL,
   PRIMARY KEY (code)
 );
 
@@ -46,48 +53,40 @@ INSERT INTO diagnostic(code, description) VALUES
 
 CREATE TABLE insurance
 (
-  policy VARCHAR(255),
-  name VARCHAR(255) NOT NULL,
+  policy VARCHAR(7),
+  name VARCHAR(15) NOT NULL,
   copay FLOAT NOT NULL,
   PRIMARY KEY (policy)
 );
 
 INSERT INTO insurance(policy, name, copay) VALUES
-    ('dbron44686', 'BronzePlus', 400.00);
+    ('dbro46', 'BronzePlus', 400.00);
 INSERT INTO insurance(policy, name, copay) VALUES
-    ('abc7868999', 'SilverPlus', 200.00);
+    ('abc789', 'SilverPlus', 200.00);
 INSERT INTO insurance(policy, name, copay) VALUES
-    ('jjohn33486', 'PlatinumPlatinum', 10.00);
-
-
+    ('jjo386', 'Platinum', 10.00);
 
 CREATE TABLE supports
 (
-  policy VARCHAR(255) NOT NULL,
-  compound VARCHAR(255) NOT NULL,
+  policy VARCHAR(7) NOT NULL,
+  compound VARCHAR(15) NOT NULL,
   FOREIGN KEY (policy) REFERENCES insurance(policy),
   FOREIGN KEY (compound) REFERENCES drug(dName)
 );
 
 INSERT INTO supports(policy, compound) VALUES
-    ('dbron44686', 'ibuprofen');
+    ('dbro46', 'ibuprofen');
 INSERT INTO supports(policy, compound) VALUES
-    ('abc7868999', 'ibuprofen');
+    ('abc789', 'ibuprofen');
 INSERT INTO supports(policy, compound) VALUES
-    ('abc7868999', 'adderall');
-INSERT INTO supports(policy, compound) VALUES
-    ('jjohn33486', 'ibuprofen');
-INSERT INTO supports(policy, compound) VALUES
-    ('jjohn33486', 'adderall');
-INSERT INTO supports(policy, compound) VALUES
-    ('jjohn33486', 'codeine');
+    ('jjo386', 'codeine');
 
 
 CREATE TABLE inventory
 (
   location INT NOT NULL, --Reffers to a isle number in the store.--
   quantity INT NOT NULL,
-  compound VARCHAR(255) NOT NULL,
+  compound VARCHAR(15) NOT NULL,
   FOREIGN KEY (compound) REFERENCES drug(dName)
 );
 
@@ -102,53 +101,53 @@ CREATE TABLE payment
 (
   authorization INT,
   cost FLOAT NOT NULL,
-  policy VARCHAR(255) NOT NULL,
-  compound VARCHAR(255) NOT NULL,
+  policy VARCHAR(7) NOT NULL,
+  compound VARCHAR(15) NOT NULL,
   PRIMARY KEY (authorization),
   FOREIGN KEY (policy) REFERENCES insurance(policy),
   FOREIGN KEY (compound) REFERENCES drug(dName)
 );
 
 INSERT INTO payment(authorization, cost, policy, compound) VALUES
-    (1, 400.00, 'dbron44686', 'ibuprofen');
+    (1, 400.00, 'dbro46', 'ibuprofen');
 INSERT INTO payment(authorization, cost, policy, compound) VALUES
-    (2, 200.00, 'abc7868999', 'adderall');
+    (2, 200.00, 'abc789', 'adderall');
 INSERT INTO payment(authorization, cost, policy, compound) VALUES
-    (3, 10.00, 'jjohn33486', 'codeine');
+    (3, 10.00, 'jjo386', 'codeine');
 
 CREATE TABLE customer
 (
   id INT,
-  name VARCHAR(255) NOT NULL,
+  name VARCHAR(15) NOT NULL,
   dob DATE NOT NULL,
-  phone VARCHAR(255) NOT NULL,
-  address VARCHAR(255) NOT NULL,
-  policy VARCHAR(255) NOT NULL,
+  phone VARCHAR(15) NOT NULL,
+  address VARCHAR(15) NOT NULL,
+  policy VARCHAR(7) NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (policy) REFERENCES insurance(policy)
 );
 
 INSERT INTO customer(id, name, dob, phone, address, policy) VALUES
     (1, 'Bilbo Baggins', TO_DATE('1979/07/08', 'yyyy/mm/dd'), '860-326-4643', 
-		'12 Main', 'dbron44686');
+		'12 Main', 'dbro46');
 INSERT INTO customer(id, name, dob, phone, address, policy) VALUES
     (2, 'Gandalf Grey', TO_DATE('1972/07/08', 'yyyy/mm/dd'), '478-346-4643', 
-		'1 Kempf', 'abc7868999');
+		'1 Kempf', 'abc789');
 INSERT INTO customer(id, name, dob, phone, address, policy) VALUES
     (3, 'George Bush', TO_DATE('1979/07/09', 'yyyy/mm/dd'), '840-333-3455', 
-		'12 twelve', 'jjohn33486');
+		'12 twelve', 'jjo386');
 
 CREATE TABLE prescription
 (
   rx INT,
   expiration DATE NOT NULL,
   quantity INT NOT NULL,
-  admin VARCHAR(255) NOT NULL,
-  indication VARCHAR(255), --may be null
+  admin VARCHAR(15) NOT NULL,
+  indication VARCHAR(15), --may be null
   refill INT NOT NULL,
   code NUMERIC(5,2) NOT NULL,
-  compound VARCHAR(255) NOT NULL,
-  physician VARCHAR(255) NOT NULL,
+  compound VARCHAR(15) NOT NULL,
+  physician VARCHAR(10) NOT NULL,
   patient int NOT NULL,
   PRIMARY KEY (rx),
   FOREIGN KEY (physician) REFERENCES physician(drLicense),
@@ -192,7 +191,7 @@ INSERT INTO sale(timestamp, authorization, rx) VALUES
 
 CREATE TABLE treats
 (
-  compound VARCHAR(255) NOT NULL,
+  compound VARCHAR(15) NOT NULL,
   code NUMERIC(5,2) NOT NULL,
   FOREIGN KEY (compound) REFERENCES drug(dName),
   FOREIGN KEY (code) REFERENCES diagnostic(code)
@@ -209,7 +208,7 @@ INSERT INTO treats (compound, code) VALUES
 CREATE TABLE allergy
 (
   name INT NOT NULL,
-  compound VARCHAR(255) NOT NULL,
+  compound VARCHAR(15) NOT NULL,
   FOREIGN KEY (name) REFERENCES customer(id),
   FOREIGN KEY (compound) REFERENCES drug(dName)
 );
